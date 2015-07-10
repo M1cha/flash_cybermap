@@ -23,7 +23,7 @@ along with CyberMap. If not, see <http://www.gnu.org/licenses/>.
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
-	<fx:Style source="CyberMap.css"/>
+	<fx:Style source="assets/css/CyberMap.css"/>
 	
 	<fx:Declarations>
 		<s:DropShadowFilter

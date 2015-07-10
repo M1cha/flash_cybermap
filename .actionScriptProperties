@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties mainApplicationPath="org/cyberteam/cybermap/CyberMap.mxml" projectUUID="4d313da9-bbc7-4b47-9e3f-7490dccf05c8" version="6">
+<actionScriptProperties mainApplicationPath="CyberMap.mxml" projectUUID="4d313da9-bbc7-4b47-9e3f-7490dccf05c8" version="6">
   <compiler additionalCompilerArguments="-locale de_DE" autoRSLOrdering="true" copyDependentFiles="true" flexSDK="Flex 4.0" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="true" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath>
       <compilerSourcePathEntry kind="1" linkType="1" path="assets"/>
@@ -15,7 +15,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
-    <application path="org/cyberteam/cybermap/CyberMap.mxml">
+    <application path="CyberMap.mxml">
       <airExcludes/>
     </application>
   </applications>
