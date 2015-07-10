@@ -1,0 +1,26 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+global
+{
+	content-background-color: #A3FFC1;
+	chromeColor: #FFFFFF;
+	focusColor: #0084FF;
+}
+
+#toolbar {
+	background-color: #FFC107;
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+}
+
+#navigationButton {
+}
+
+
+@font-face {
+	src:url("../assets/fonts/Roboto-Regular.ttf");
+	fontFamily: RobotoRegular;
+	embedAsCFF: true;
+}     
