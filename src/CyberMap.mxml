@@ -26,36 +26,60 @@
 	<fx:Style source="assets/css/CyberMap.css"/>
 	
 	<fx:Declarations>
-		<s:DropShadowFilter
-			id="dropShadow1"
-			quality="1"
-			color="#000000"
-			alpha="0.8"
-			distance="0"
-			blurX="8"
-			blurY="8"
-			strength="1"
-			/>
-	</fx:Declarations>
-	
-	<s:Panel width="100%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" id="map">
-		
-	</s:Panel>
+		<!-- toolbar dropdownshadow -->
+		<s:DropShadowFilter id="dropShadow1" quality="1" color="#000000" alpha="0.8" distance="0" blurX="8" blurY="8" strength="1" />
 
+		<fx:int id="animDuration">170</fx:int>
+		<fx:int id="navDrawerHiddenPosition">-248</fx:int>
+		
+		<!-- NavigationDrawer animation -->
+		<s:Move id="navDrawerAnimation" duration="{animDuration}" xFrom="{navDrawerHiddenPosition}" xTo="0" />
+		<s:Fade id="obfuscatorFadeInAnimation" duration="{animDuration}" alphaFrom="0" alphaTo="0.5"/>
+		<s:Fade id="obfuscatorFadeOutAnimation" duration="{animDuration}" alphaFrom="0.5" alphaTo="0" effectEnd="obfuscatorEnd(event)"/>
+
+	</fx:Declarations>
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.EffectEvent;
+			private function showNavigationDrawer():void {
+				navDrawerAnimation.play([navigationDrawer]);
+
+				obfuscator.visible = true;
+				obfuscatorFadeInAnimation.play([obfuscator]);
+			}
+
+			private function hideNavigationDrawer():void {
+				navDrawerAnimation.play([navigationDrawer], true);
+				obfuscatorFadeOutAnimation.play([obfuscator]);
+			}
+
+			private function obfuscatorEnd(event:EffectEvent):void {
+				obfuscator.visible = false;
+			}
+		]]>
+	</fx:Script>
+
+	<!-- PLACE HOLDER FOR THE MAP -->
+	<s:Panel id="map" width="100%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" />
+
+	<!-- TOOLBAR -->
 	<s:Panel width="100%" height="64" id="toolbar" skinClass="org.cyberteam.cybermap.WhitePanelSkin" filters="{[dropShadow1]}">
 		<s:layout>
 			<s:BasicLayout/>
 		</s:layout>
-		<s:Label paddingLeft="80" height="64" text="CyberMap" fontSize="20" top="24" color="#424242" />
-		<s:Button label="Button" width="56" height="100%" id="navigationButton" skinClass="org.cyberteam.cybermap.navbutton" buttonMode="true" />
-	</s:Panel>
-	
-	<s:Panel width="100%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" alpha="0" visible="false" backgroundColor="#000000">
-	</s:Panel>
-	
-	<s:Panel width="240" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin"  filters="{[dropShadow1]}" visible="false">
-	</s:Panel>
 
+		<s:Label paddingLeft="80" height="64" text="CyberMap" fontSize="20" top="24" color="#424242" />
+		<s:Button label="Button" width="56" height="100%" id="navigationButton" skinClass="org.cyberteam.cybermap.navbutton" click="showNavigationDrawer()" buttonMode="true" />
+	</s:Panel>
+	
+	<!-- OBFUSCATOR -->
+	 <s:Panel id="obfuscator" width="100%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" alpha="0" visible="false" backgroundColor="#000000" click="hideNavigationDrawer()">
+	</s:Panel>
+	
+	<!-- NAVIGATIONDRAWER -->
+	<s:Panel id="navigationDrawer" width="240" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}" visible="true">
+	</s:Panel>
 		
 </s:WindowedApplication>
 
