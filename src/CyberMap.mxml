@@ -31,7 +31,7 @@
 		<fx:int id="navDrawerHiddenPosition">{-(navigationDrawer.width + 8)}</fx:int>
 
 		<!-- toolbar dropshadow -->
-		<s:DropShadowFilter id="dropShadow1" quality="1" color="#000000" alpha="0.8" distance="0" blurX="8" blurY="8" strength="1" />
+		<s:DropShadowFilter id="dropShadow1" quality="1" color="#000000" alpha="0.8" distance="0" blurX="{MaterialUtils.dp2px(8)}" blurY="{MaterialUtils.dp2px(8)}" strength="1" />
 		
 		<!-- NavigationDrawer animation -->
 		<s:Move id="navDrawerAnimation" duration="{animDuration}" xFrom="{navDrawerHiddenPosition}" xTo="0" />
