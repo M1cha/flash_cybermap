@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   CyberMap
-  Copyright 2015 ____ All rights reserved.
+  Copyright 2015 CyberTeam All rights reserved.
 
   CyberMap is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.events.EffectEvent;
+			
+			import org.cyberteam.cybermap.FileSelection;
 			import org.github.material.*;
 
 			// setup material settings
@@ -81,8 +83,14 @@
 	
 	<!-- navigation drawer -->
 	<s:Panel id="navigationDrawer" width="{MaterialUtils.dp2px(240)}" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}">
-		<!-- just an example button -->
-		<material:Button label="Button" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" />
+		<s:VGroup height="100%" width="100%">
+			<material:Button label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="new FileSelection(this)" />
+			<s:List id="list" width="100%" borderVisible="false">
+				<s:dataProvider>
+					<s:ArrayList id="dataprover_list" />
+				</s:dataProvider>
+			</s:List>
+		</s:VGroup>
 	</s:Panel>
 
 </s:WindowedApplication>
