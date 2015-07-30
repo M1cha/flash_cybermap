@@ -1,5 +1,14 @@
 package org.cyberteam.cybermap
 {
+	//This class is used for the gpx file selection.
+	//Opens a dialog for the user being able to choose one or more .gpx files.
+	//Loads the xml and saves the xml files into an array.
+	//Creates a list and fills an arraycollection, which is the data provider, with the needed entries
+	//Creates LatLng objects through the .gpx files and saves them.
+	//The final distance is getting calculated through a given haversine function.
+	//TODO add and implement the mouse listener to the list object.
+	//TODO add a function to remove loaded gpx
+	
 	import com.umapper.umap.types.LatLng;
 	
 	import flash.events.Event;
@@ -8,45 +17,51 @@ package org.cyberteam.cybermap
 	import flash.net.FileReference;
 	import flash.net.FileReferenceList;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
-	import mx.controls.List;
+	import mx.controls.Alert;
 	
+	import spark.components.Group;
 	import spark.components.Label;
+	import spark.components.List;
 	import spark.components.VGroup;
+	
+	default xml namespace = new Namespace("http://www.topografix.com/GPX/1/1");
 
-	//This class is used for the gpx file selection.
-	//Opens a dialog for the user being able to choose one or more .gpx files.
-	//Loads the xml and saves the xml files into an array.
-	//Creates LatLng objects through the .gpx files and saves them.
-	//Creates two labels which will be added to the data provider for a list (name of the route and distance).
-	//The final distance is getting calculated.
-	//TODO check if the file already was loaded!.
-	//TODO add and implement the mouse listener to the list object.
-	//TODO change implemention that it would work without having the mxml ready.
-	//TODO add a function to remove loaded gpx
 	
 	public class FileSelection
 	{
 		private var m_gui:CyberMap;
 		private var m_fileRef:FileReferenceList;
 		private var m_xmlData:Array;
+		private var m_listData:ArrayCollection;
 		
+		private var m_list:List;
 		
-		public function FileSelection(gui:CyberMap)
+		//Constructor of the class
+		//Percent high and width needed to avoid troubles within scaling the application.
+		//Creates a list and adds it to the parent (which has to inherit from group)
+		public function FileSelection(gui:CyberMap, parent:Group)
 		{
 			m_gui = gui;
 			
-			//not sure where this has to be
-			default xml namespace = new Namespace("http://www.topografix.com/GPX/1/1");
-
 			m_xmlData = new Array();
-			showDialog();
+			
+			m_listData = new ArrayCollection();
+			
+			m_list = new List();
+			m_list.percentWidth = 100;
+			m_list.percentHeight = 100;
+			m_list.setStyle("borderVisible", false);
+			m_list.dataProvider = m_listData;
+			
+			parent.addElement(m_list);
 		}
 		
 		//Opens the dialog for opening multiple files.
 		//Using a filter here for just seeing gxp files.
 		//There will be an event called for each selected file.
-		private function showDialog():void
+		public function showDialog():void
 		{
 			m_fileRef = new FileReferenceList();
 			var gpxFilter:FileFilter = new FileFilter(".gpx","*.gpx");
@@ -55,15 +70,15 @@ package org.cyberteam.cybermap
 		}
 		
 		
-		//creates a file for each selected file which is in a list included.
-		//start to load each file.
+		//Creates a file for each selected file which is in a list included.
+		//Start to load each file.
 		private function selectFile(event:Event):void
 		{
 			event.target.removeEventListener(Event.COMPLETE, selectFile);
-
+			
 			//no idea if this has to be done
 			event.currentTarget.fileList as ArrayList
-				
+			
 			var file:FileReference;
 			
 			for(var i:Number = 0; i < m_fileRef.fileList.length; i++) {
@@ -74,27 +89,31 @@ package org.cyberteam.cybermap
 		}
 		
 		
-		//once a file is loaded, add it to a xml collection.
+		//If the file was not loaded so far, load it.
+		//Save the name of the xml to check if it already was loaded.
+		//Calls the addListEntry Method which will add the list entry
 		private function onLoaded(event:Event):void
 		{
 			event.target.removeEventListener(Event.COMPLETE, onLoaded);
+			
 			var xml:XML = new XML(event.target.data)
-			m_xmlData.push(xml);
-			addListEntry(xml);
+				
+			if(m_xmlData.indexOf(event.target.name) == -1)
+			{
+				m_xmlData.push(event.target.name);
+				addListEntry(xml);
+			}
+			else
+			{
+				Alert.show("File already loaded!");
+			}
 		}
-		
-		
-		//creats a list
-		//adds a label to the dataprovider which constains the name of the route.
-		//calculates the difference by using LatLng objects from the api.
-		//adds another label to the dataprovider which contains the max. difference of the route.
+			
+		//Adds a label to the dataprovider which constains the name of the route.
+		//Calculates the difference by using LatLng objects from the api.
+		//Adds another label to the dataprovider which contains the max. difference of the route.
 		private function addListEntry(xml:XML):void
 		{
-			//name of the route
-			var nameLabel:Label = new Label();
-			nameLabel.name = xml.trk.name;
-			//m_gui.dataprover_list.addItem(nameLabel);
-
 			//distance of the route
 			var latlangs:Array = new Array();
 			
@@ -115,17 +134,10 @@ package org.cyberteam.cybermap
 			
 			//round it and finish the string
 			var str:String = distance.toFixed(1) + " km";
-			
-			var distanceLabel:Label = new Label();
-			distanceLabel.name = str;
-			//m_gui.dataprover_list.addItem(distanceLabel);
-			
-			
-			var testLabel:Label = new Label();
-			testLabel.name = nameLabel + "\n" + distanceLabel;
-			m_gui.dataprover_list.addItem(testLabel);
+								
+			m_listData.addItem(xml.trk.name + "\n" + str);
 		}
-				
+		
 		
 		//function to calculate the distance of two points
 		private static function haversine(from:LatLng,to:LatLng):Number

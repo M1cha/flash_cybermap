@@ -21,7 +21,10 @@
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
 					   xmlns:mx="library://ns.adobe.com/flex/mx" showStatusBar="false"
 					   xmlns:cm="org.cyberteam.material.*"
-					   xmlns:material="org.github.material.*">
+					   xmlns:material="org.github.material.*"
+					   minWidth="800" minHeight="600"
+					   creationComplete="init()"
+					   >
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
@@ -46,6 +49,13 @@
 			
 			import org.cyberteam.cybermap.FileSelection;
 			import org.github.material.*;
+			
+			private var fileSelection:FileSelection;
+			
+			private function init(): void
+			{
+				fileSelection = new FileSelection(this, listParent);
+			}
 
 			// setup material settings
 			MaterialUtils.primaryColor = 0xff9800;
@@ -83,13 +93,8 @@
 	
 	<!-- navigation drawer -->
 	<s:Panel id="navigationDrawer" width="{MaterialUtils.dp2px(240)}" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}">
-		<s:VGroup height="100%" width="100%">
-			<material:Button label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="new FileSelection(this)" />
-			<s:List id="list" width="100%" borderVisible="false">
-				<s:dataProvider>
-					<s:ArrayList id="dataprover_list" />
-				</s:dataProvider>
-			</s:List>
+		<s:VGroup id="listParent" height="100%" width="100%">
+			<material:Button label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="fileSelection.showDialog()" />
 		</s:VGroup>
 	</s:Panel>
 
