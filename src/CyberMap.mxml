@@ -21,7 +21,7 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:material="org.github.material.*" minWidth="800" minHeight="600"
-			   creationComplete="init()" xmlns:umap="com.umapper.flex.umap.*">
+			   xmlns:umap="com.umapper.flex.umap.*" xmlns:styles="com.umapper.umap.styles.*">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
@@ -43,15 +43,15 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.events.EffectEvent;
-			
-			import org.cyberteam.cybermap.FileSelection;
+			import org.cyberteam.cybermap.gpx.GPX;
+			import org.cyberteam.cybermap.gpx.GPXLoader;
 			import org.github.material.*;
 			
-			private var fileSelection:FileSelection;
-			
-			private function init(): void
-			{
-				fileSelection = new FileSelection(this, gpxlist);
+			private function onGPXLoaded(gpx:GPX):void {
+				var item:org.github.material.TwoLineListItem = new org.github.material.TwoLineListItem();
+				item.label=gpx.name;
+				item.labelSecondary = gpx.distance.toFixed(1) + " km"
+				gpxlist.addElement(item);
 			}
 
 			// setup material settings
@@ -93,10 +93,14 @@
 		<s:layout>
 			<s:VerticalLayout gap="0"/>
 		</s:layout>
-		
-		<material:Button cornerRadius="0" nomargin="true" height="{MaterialUtils.dp2px(36)}" label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="fileSelection.showDialog()" />
-		<mx:HRule width="100%" strokeWidth="1" strokeColor="#DDDDDD"/>
-		<s:VGroup id="gpxlist"/>
+
+		<material:Button cornerRadius="0" nomargin="true" height="{MaterialUtils.dp2px(36)}" label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="GPXLoader.fromFileDialog(onGPXLoaded)" />
+		<mx:HRule width="100%" strokeWidth="1" strokeColor="#DDDDDD" />
+		<s:Scroller id="scroller" focusEnabled="false" height="100%" width="100%"
+					hasFocusableChildren="true"
+					horizontalCenter="0" verticalCenter="0" horizontalScrollPolicy="off">
+			<s:VGroup id="gpxlist" width="100%" gap="0" />
+		</s:Scroller>
 	</s:Panel>
 
 </s:Application>
