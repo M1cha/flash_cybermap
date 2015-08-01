@@ -51,7 +51,7 @@
 			
 			private function init(): void
 			{
-				fileSelection = new FileSelection(this, listParent);
+				fileSelection = new FileSelection(this, gpxlist);
 			}
 
 			// setup material settings
@@ -90,9 +90,13 @@
 	
 	<!-- navigation drawer -->
 	<s:Panel id="navigationDrawer" width="{MaterialUtils.dp2px(240)}" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}">
-		<s:VGroup id="listParent" height="100%" width="100%">
-			<material:Button label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="fileSelection.showDialog()" />
-		</s:VGroup>
+		<s:layout>
+			<s:VerticalLayout gap="0"/>
+		</s:layout>
+		
+		<material:Button cornerRadius="0" nomargin="true" height="{MaterialUtils.dp2px(36)}" label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="fileSelection.showDialog()" />
+		<mx:HRule width="100%" strokeWidth="1" strokeColor="#DDDDDD"/>
+		<s:VGroup id="gpxlist"/>
 	</s:Panel>
 
 </s:Application>
