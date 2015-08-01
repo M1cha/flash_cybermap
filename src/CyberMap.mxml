@@ -21,7 +21,7 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:material="org.github.material.*" minWidth="800" minHeight="600"
-			   creationComplete="init()">
+			   creationComplete="init()" xmlns:umap="com.umapper.flex.umap.*">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
@@ -76,7 +76,7 @@
 	</fx:Script>
 
 	<!-- map -->
-	<s:Panel id="map" width="100%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" />
+	<umap:UMapComponent id="map" width="100%" height="100%"/>
 	
 	<!-- toolbar -->
 	<material:Toolbar id="toolbar" title="CyberMap">
