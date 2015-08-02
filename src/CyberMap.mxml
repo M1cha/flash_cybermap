@@ -21,15 +21,12 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:material="org.github.material.*" minWidth="800" minHeight="600"
-			   xmlns:umap="com.umapper.flex.umap.*" xmlns:styles="com.umapper.umap.styles.*">
+			   xmlns:umap="com.umapper.flex.umap.*" xmlns:styles="com.umapper.umap.styles.*" creationComplete="onCreationComplete()" xmlns:gpx="org.cyberteam.cybermap.gpx.*">
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
 	
 	<fx:Declarations>
-		<fx:int id="animDuration">170</fx:int>
-		<fx:int id="navDrawerHiddenPosition">{-(navigationDrawer.width + 8)}</fx:int>
-
 		<!-- toolbar dropshadow -->
 		<s:DropShadowFilter id="dropShadow1" quality="1" color="#000000" alpha="0.8" distance="0" blurX="{MaterialUtils.dp2px(8)}" blurY="{MaterialUtils.dp2px(8)}" strength="1" />
 
@@ -37,15 +34,141 @@
 
 	<fx:Script>
 		<![CDATA[
+			import com.umapper.umap.gui.MapTypeControl;
+			import com.umapper.umap.gui.PositionControl;
+			import com.umapper.umap.gui.ZoomControl;
+			import com.umapper.umap.overlays.Layer;
+			import com.umapper.umap.overlays.Polyline;
+			import com.umapper.umap.styles.GeometryStyle;
+			import com.umapper.umap.styles.GradientStyle;
+			import com.umapper.umap.types.LatLng;
+			
+			import mx.effects.AnimateProperty;
+			import mx.geom.Transform;
+			
 			import org.cyberteam.cybermap.gpx.GPX;
 			import org.cyberteam.cybermap.gpx.GPXLoader;
 			import org.github.material.*;
 			
-			private function onGPXLoaded(gpx:GPX):void {
-				var item:org.github.material.TwoLineListItem = new org.github.material.TwoLineListItem();
+			import spark.effects.Animate;
+			import spark.effects.Move;
+			import spark.effects.Scale;
+			import spark.effects.animation.SimpleMotionPath;
+			
+			private var gpxObjects:Array = [];
+			private var style:GeometryStyle = new GeometryStyle();
+			private var currentLayer:Layer = null;
+			private var listItems:Object = {};
+			private var isToolbarExtended:Boolean = false;
+			
+			private function onCreationComplete():void {
+				// configure polyline style
+				style.strokeThickness = 10;
+				style.strokeRGB = 0x00b2fc;
+				style.strokeGradient = new GradientStyle();
+				
+				// controls
+				map.addControl(new MapTypeControl());
+				map.addControl(new ZoomControl());
+				map.addControl(new PositionControl());
+			}
+			
+			private function onGPXLoaded(gpx:GPX, item:org.github.material.TwoLineListItem):void {
 				item.label=gpx.name;
 				item.labelSecondary = gpx.distance.toFixed(1) + " km"
-				gpxlist.addElement(item);
+
+				// create layer
+				var layer:Layer = new Layer();
+				gpx.line.setStyle(style);
+				layer.addChild(gpx.line);
+				
+				function onItemClicked():void{
+					// close navigationdrawer
+					navigationDrawer.fadeOut();
+					
+					// remove current layer
+					if(currentLayer!=null) {
+						map.removeLayer(currentLayer);
+						currentLayer = null;
+					}
+					
+					// set new layer
+					map.addLayer(layer);
+					currentLayer = layer;
+					
+					// set map zoom and position
+					map.setBounds(gpx.line.getBoundsLatLng());
+					map.zoom -= 1;
+					
+					// draw elevation
+					elevation.drawGPX(gpx);
+					
+					// set title
+					titleDisplay.text = "Cybermap > "+gpx.name;
+				}
+				
+				// add event listener
+				item.addEventListener(MouseEvent.CLICK, onItemClicked);
+			}
+			
+			private function onUploadButtonClicked():void {
+				GPXLoader.fromFileDialog({
+					item:new org.github.material.TwoLineListItem(),
+					onFileSelected:function(fileRef:FileReference):Object{
+						var item:org.github.material.TwoLineListItem = new org.github.material.TwoLineListItem();
+						item.label="Loading "+fileRef.name+"  ...";
+						gpxlist.addElement(item);
+						
+						return item;
+					},
+					
+					onFileLoaded:function(gpx:GPX, item:org.github.material.TwoLineListItem):void{
+						onGPXLoaded(gpx, item);
+					}
+				});
+			}
+			
+			private function swapPropertyAnimation(a:AnimateProperty):void {
+				var tmp:Number = a.fromValue;
+				a.fromValue = a.toValue;
+				a.toValue = tmp;
+			}
+			
+			[Embed(source='assets/images/ic_expand_more_black_48px.svg')]
+			[Bindable]
+			var mIconMore:Class;
+			
+			[Embed(source='assets/images/ic_expand_less_black_48px.svg')]
+			[Bindable]
+			var mIconLess:Class;
+			private function onElevationButtonClicked():void {
+				var duration:Number = 170;
+				
+				var aTop:AnimateProperty = new AnimateProperty();
+				aTop.property = "top";
+				aTop.fromValue = -elevation.height + MaterialUtils.dp2px(56);
+				aTop.toValue = MaterialUtils.dp2px(56);
+				aTop.duration = duration;
+				
+				var aHeight:AnimateProperty = new AnimateProperty();
+				aHeight.property = "height";
+				aHeight.fromValue = MaterialUtils.dp2px(56);
+				aHeight.toValue = MaterialUtils.dp2px(56 + 200);
+				aHeight.duration = duration;
+				
+				if(isToolbarExtended) {
+					swapPropertyAnimation(aTop);
+					swapPropertyAnimation(aHeight);
+					
+					toggleButton.icon = mIconMore;
+				}
+				else {
+					toggleButton.icon = mIconLess;
+				}
+				
+				aTop.play([elevation]);
+				aHeight.play([toolbar]);
+				isToolbarExtended = !isToolbarExtended
 			}
 
 			// setup material settings
@@ -54,17 +177,23 @@
 	</fx:Script>
 
 	<!-- map -->
-	<umap:UMapComponent id="map" width="100%" height="100%"/>
+	<umap:UMapComponent id="map" width="100%" top="{MaterialUtils.dp2px(56)}" bottom="0"/>
 	
 	<!-- toolbar -->
 	<material:Toolbar id="toolbar" title="CyberMap">
-		<!-- navigation button -->
-		<s:Button buttonMode="true" skinClass="org.github.material.skins.NavigationButton" click="navigationDrawer.fadeIn()" />
+		<gpx:ElevationGraph id="elevation" left="0" right="0" top="{-height}" height="{MaterialUtils.dp2px(200)}"/>
+		
+		<s:Panel left="0" top="0" right="0" height="{MaterialUtils.dp2px(56)}" skinClass="org.github.material.skins.WhitePanelSkin" backgroundColor="{MaterialUtils.primaryColor}">
+			<s:Label id="titleDisplay" text="CyberMap" top="{MaterialUtils.dp2px(20)}" left="{MaterialUtils.dp2px(72)}" right="0" textAlign="left" verticalAlign="middle" fontFamily="RobotoMedium" fontSize="{MaterialUtils.dp2px(20)}" />
+			
+			<material:NavigationButton iconTop="{MaterialUtils.dp2px(12)}" iconLeft="{MaterialUtils.dp2px(16)}" icon="@Embed(source='assets/images/ic_menu_black_48px.svg')" click="navigationDrawer.fadeIn()" />
+			<material:NavigationButton id="toggleButton" iconTop="{MaterialUtils.dp2px(6)}" icon="{mIconMore}" iconRight="{MaterialUtils.dp2px(28)}" right="0" click="onElevationButtonClicked()" />
+		</s:Panel>
 	</material:Toolbar>
 	
 	<!-- navigation drawer -->
 	<material:NavigationDrawer id="navigationDrawer">
-		<material:Button cornerRadius="0" nomargin="true" height="{MaterialUtils.dp2px(36)}" label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="GPXLoader.fromFileDialog(onGPXLoaded)" />
+		<material:Button cornerRadius="0" nomargin="true" height="{MaterialUtils.dp2px(36)}" label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="onUploadButtonClicked()" />
 		<mx:HRule width="100%" strokeWidth="1" strokeColor="#DDDDDD" />
 		<s:Scroller id="scroller" focusEnabled="false" height="100%" width="100%"
 					hasFocusableChildren="true"
