@@ -108,7 +108,10 @@
 				}
 				
 				// add event listener
-				item.addEventListener(MouseEvent.CLICK, onItemClicked);
+				// according to Material specs we should use single click here, but the task's PDF tells us to use doubleclick -_-
+				//item.addEventListener(MouseEvent.CLICK, onItemClicked);
+				item.doubleClickEnabled = true;
+				item.addEventListener(MouseEvent.DOUBLE_CLICK, onItemClicked);
 			}
 			
 			private function onUploadButtonClicked():void {
