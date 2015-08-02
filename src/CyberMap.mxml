@@ -89,7 +89,7 @@
 	</s:Panel>
 	
 	<!-- navigation drawer -->
-	<s:Panel id="navigationDrawer" width="{MaterialUtils.dp2px(240)}" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}">
+	<s:Panel id="navigationDrawer" minWidth="{MaterialUtils.dp2px(240)}" width="30%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}">
 		<s:layout>
 			<s:VerticalLayout gap="0"/>
 		</s:layout>
