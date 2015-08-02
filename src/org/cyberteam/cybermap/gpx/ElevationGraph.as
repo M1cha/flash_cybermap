@@ -14,17 +14,49 @@ package org.cyberteam.cybermap.gpx
 	import mx.core.UIComponent;
 	import mx.utils.OnDemandEventDispatcher;
 	
+	import org.github.material.MaterialUtils;
+	
 	import spark.components.Group;
+	import spark.components.Label;
 	import spark.primitives.BitmapImage;
 	import spark.primitives.Rect;
 	
-	public class ElevationGraph extends BitmapImage
+	public class ElevationGraph extends Group
 	{
+		private var mBitmapImage:CustomBitmapImage = null;
+		private var mLabel:Label = null;
 		
+		public function ElevationGraph() {
+			mBitmapImage = new CustomBitmapImage();
+			mBitmapImage.left = 0;
+			mBitmapImage.top = 0;
+			mBitmapImage.right = 0;
+			mBitmapImage.bottom = 0;
+			addElement(mBitmapImage);
+			
+			mLabel = new Label();
+			mLabel.text = "Select a Track :)";
+			mLabel.setStyle("fontFamily", "RobotoMedium");
+			mLabel.setStyle("fontSize", MaterialUtils.dp2px(20));
+			mLabel.setStyle("verticalAlign", "middle");
+			mLabel.setStyle("textAlign", "center");
+			mLabel.percentWidth = 100;
+			mLabel.percentHeight = 100;
+			addElement(mLabel);
+		}
 		
+		public function onStatusUpdate(gpx:GPX, status:uint):void {
+			mLabel.text = "Loading "+status+"/"+gpx.points.length+" ...";
+		}
 		
-		public function drawGPX(gpx:GPX):void {
-			var elevation:Object = gpx.getElevation();
+		public function onLoadingFinished(gpx:GPX, elevation:Object):void {
+			if(elevation==null) {
+				mLabel.text = "A error occured!"
+				return;
+			}
+			
+			mLabel.text = "";
+			mBitmapImage.visible = true;
 			
 			// create sprite
 			var sprite:UIComponent = new UIComponent();
@@ -54,7 +86,22 @@ package org.cyberteam.cybermap.gpx
 			bmd.draw(sprite, matrix, null, null, null, true);
 			
 			// set new bitmap data
-			setBitmapData(bmd);
+			mBitmapImage.setBitmapDataPublic(bmd);
 		}
+		
+		public function drawGPX(gpx:GPX):void {
+			mBitmapImage.visible = false;
+			gpx.getElevation(onStatusUpdate, onLoadingFinished);
+		}
+	}
+}
+import flash.display.BitmapData;
+
+import spark.primitives.BitmapImage;
+
+class CustomBitmapImage extends BitmapImage {
+	
+	public function setBitmapDataPublic(bmd:BitmapData):void {
+		setBitmapData(bmd);
 	}
 }

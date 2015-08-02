@@ -5,6 +5,16 @@ package org.cyberteam.cybermap.gpx
 	import com.umapper.umap.types.LatLngBounds;
 	import com.umapper.umap.utils.GPX;
 	
+	import flash.events.Event;
+	import flash.events.HTTPStatusEvent;
+	import flash.events.IOErrorEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLLoaderDataFormat;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.URLVariables;
+	
 	default xml namespace = new Namespace("http://www.topografix.com/GPX/1/1");
 
 	public class GPX
@@ -40,9 +50,15 @@ package org.cyberteam.cybermap.gpx
 			return (Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum);
 		}
 		
-		public function getElevation():Object {
-			if(elevation!=null)
-				return elevation;
+		public function getElevation(statusUpdate:Function, onFinished:Function):void {
+			var i:uint = 0;
+			var thiz:GPX = this;
+			
+			// return cache
+			if(elevation!=null) {
+				onFinished(thiz, elevation);
+				return;
+			}
 			
 			elevation = {
 				data:[],
@@ -50,17 +66,49 @@ package org.cyberteam.cybermap.gpx
 				max:null
 			};
 			
-			for(var i:uint = 0; i<points.length; i++) {
-				var val:Number = randomRange(10, 800);
-				elevation.data[i] = val;
+			function onCompleted(e:Event):void{
+				if(e!=null) {
+					var val:uint = e.target.data;
+					elevation.data[i++] = val;
+					
+					if(elevation.max==null || val>elevation.max)
+						elevation.max = val;
+					if(elevation.min==null || val<elevation.min)
+						elevation.min = val;
+				}
 				
-				if(elevation.max==null || val>elevation.max)
-					elevation.max = val;
-				if(elevation.min==null || val<elevation.min)
-					elevation.min = val;
+				if(elevation.data.length==points.length)
+					onFinished(thiz, elevation);
+				else {
+					statusUpdate(thiz, i);
+					
+					// build variables
+					var requestVars:URLVariables = new URLVariables();
+					requestVars.lat = points[i].lat;
+					requestVars.lng = points[i].lng;
+					requestVars.username = "demo"; // this way we can use this (NON_PRODUCTION APP!!) without a API key
+					
+					// build request
+					var request:URLRequest = new URLRequest();
+					request.url = "http://api.geonames.org/astergdem";
+					request.method = URLRequestMethod.GET;
+					request.data = requestVars;
+					
+					// send request
+					loader.load(request);
+				}
 			}
 			
-			return elevation;
+			// create loader
+			var loader:URLLoader = new URLLoader();
+			loader.dataFormat = URLLoaderDataFormat.TEXT;
+			loader.addEventListener(Event.COMPLETE, onCompleted);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, function():void{
+				onFinished(thiz, null);
+			});
+
+			// start
+			onCompleted(null);
 		}
 		
 		/**
