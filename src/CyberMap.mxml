@@ -32,17 +32,11 @@
 
 		<!-- toolbar dropshadow -->
 		<s:DropShadowFilter id="dropShadow1" quality="1" color="#000000" alpha="0.8" distance="0" blurX="{MaterialUtils.dp2px(8)}" blurY="{MaterialUtils.dp2px(8)}" strength="1" />
-		
-		<!-- NavigationDrawer animation -->
-		<s:Move id="navDrawerAnimation" duration="{animDuration}" xFrom="{navDrawerHiddenPosition}" xTo="0" />
-		<s:Fade id="obfuscatorFadeInAnimation" duration="{animDuration}" alphaFrom="0" alphaTo="0.5"/>
-		<s:Fade id="obfuscatorFadeOutAnimation" duration="{animDuration}" alphaFrom="0.5" alphaTo="0" effectEnd="obfuscatorEnd(event)"/>
 
 	</fx:Declarations>
 
 	<fx:Script>
 		<![CDATA[
-			import mx.events.EffectEvent;
 			import org.cyberteam.cybermap.gpx.GPX;
 			import org.cyberteam.cybermap.gpx.GPXLoader;
 			import org.github.material.*;
@@ -56,22 +50,6 @@
 
 			// setup material settings
 			MaterialUtils.primaryColor = 0xff9800;
-
-			private function showNavigationDrawer():void {
-				navDrawerAnimation.play([navigationDrawer]);
-
-				obfuscator.visible = true;
-				obfuscatorFadeInAnimation.play([obfuscator]);
-			}
-
-			private function hideNavigationDrawer():void {
-				navDrawerAnimation.play([navigationDrawer], true);
-				obfuscatorFadeOutAnimation.play([obfuscator]);
-			}
-
-			private function obfuscatorEnd(event:EffectEvent):void {
-				obfuscator.visible = false;
-			}
 		]]>
 	</fx:Script>
 
@@ -81,19 +59,11 @@
 	<!-- toolbar -->
 	<material:Toolbar id="toolbar" title="CyberMap">
 		<!-- navigation button -->
-		<s:Button buttonMode="true" skinClass="org.github.material.skins.NavigationButton" click="showNavigationDrawer()" />
+		<s:Button buttonMode="true" skinClass="org.github.material.skins.NavigationButton" click="navigationDrawer.fadeIn()" />
 	</material:Toolbar>
-
-	<!-- obfuscator -->
-	<s:Panel id="obfuscator" width="100%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" alpha="0" visible="false" backgroundColor="#000000" click="hideNavigationDrawer()">
-	</s:Panel>
 	
 	<!-- navigation drawer -->
-	<s:Panel id="navigationDrawer" minWidth="{MaterialUtils.dp2px(240)}" width="30%" height="100%" skinClass="org.cyberteam.cybermap.WhitePanelSkin" x="{navDrawerHiddenPosition}" filters="{[dropShadow1]}">
-		<s:layout>
-			<s:VerticalLayout gap="0"/>
-		</s:layout>
-
+	<material:NavigationDrawer id="navigationDrawer">
 		<material:Button cornerRadius="0" nomargin="true" height="{MaterialUtils.dp2px(36)}" label="Upload" width="100%" buttonColor="#ffffff" color="{MaterialUtils.primaryColor}" click="GPXLoader.fromFileDialog(onGPXLoaded)" />
 		<mx:HRule width="100%" strokeWidth="1" strokeColor="#DDDDDD" />
 		<s:Scroller id="scroller" focusEnabled="false" height="100%" width="100%"
@@ -101,6 +71,6 @@
 					horizontalCenter="0" verticalCenter="0" horizontalScrollPolicy="off">
 			<s:VGroup id="gpxlist" width="100%" gap="0" />
 		</s:Scroller>
-	</s:Panel>
+	</material:NavigationDrawer>
 
 </s:Application>
