@@ -136,11 +136,11 @@
 			
 			[Embed(source='assets/images/ic_expand_more_black_48px.svg')]
 			[Bindable]
-			var mIconMore:Class;
+			private var mIconMore:Class;
 			
 			[Embed(source='assets/images/ic_expand_less_black_48px.svg')]
 			[Bindable]
-			var mIconLess:Class;
+			private var mIconLess:Class;
 			private function onElevationButtonClicked():void {
 				var duration:Number = 170;
 				
