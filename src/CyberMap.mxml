@@ -189,8 +189,8 @@
 		<s:Panel left="0" top="0" right="0" height="{MaterialUtils.dp2px(56)}" skinClass="org.github.material.skins.WhitePanelSkin" backgroundColor="{MaterialUtils.primaryColor}">
 			<s:Label id="titleDisplay" text="CyberMap" top="{MaterialUtils.dp2px(20)}" left="{MaterialUtils.dp2px(72)}" right="0" textAlign="left" verticalAlign="middle" fontFamily="RobotoMedium" fontSize="{MaterialUtils.dp2px(20)}" />
 			
-			<material:NavigationButton iconTop="{MaterialUtils.dp2px(12)}" iconLeft="{MaterialUtils.dp2px(16)}" icon="@Embed(source='assets/images/ic_menu_black_48px.svg')" click="navigationDrawer.fadeIn()" />
-			<material:NavigationButton id="toggleButton" iconTop="{MaterialUtils.dp2px(6)}" icon="{mIconMore}" iconRight="{MaterialUtils.dp2px(28)}" right="0" click="onElevationButtonClicked()" />
+			<material:NavigationButton iconTop="12" iconLeft="16" icon="@Embed(source='assets/images/ic_menu_black_48px.svg')" click="navigationDrawer.fadeIn()" />
+			<material:NavigationButton id="toggleButton" iconTop="6" icon="{mIconMore}" iconRight="28" right="0" click="onElevationButtonClicked()" />
 		</s:Panel>
 	</material:Toolbar>
 	
